@@ -7,11 +7,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='.', description="Oh baby...", intents=intents)
 
+discord_token = os.getenv('DISCORD_TOKEN')
+
 configFile = "config.json"
 if os.path.isfile("config.json"):
     file = open("config.json")
     conf = json.load(file)
-    discord_token = conf["discord_token"]
+    discord_token = discord_token or conf["discord_token"]
 else:
     print("RIP no config")
 
