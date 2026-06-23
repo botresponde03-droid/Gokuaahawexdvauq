@@ -13,7 +13,7 @@ configFile = "config.json"
 if os.path.isfile("config.json"):
     file = open("config.json")
     conf = json.load(file)
-    discord_token = discord_token or conf["discord_token"]
+    discord_token = discord_token or conf.get("discord_token")
 else:
     print("RIP no config")
 
@@ -31,21 +31,30 @@ async def stop(ctx):
     await bot.close()
 
 @bot.command()
-async def play(ctx, word:str=None):
-    await bot.change_presence(activity=discord.Game(name=word))
+async def play(ctx, word: str = None):
+    if word:
+        await bot.change_presence(activity=discord.Game(name=word))
+    else:
+        await ctx.send("Usage: .play <game_name>")
 
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
 
 @bot.event
-async def on_message(message):   
+async def on_message(message):
     await bot.process_commands(message)
 
-# Load cogs here
 async def setup_hook():
-    await bot.load_extension("PornHub")
+    try:
+        await bot.load_extension("PornHub")
+    except Exception as e:
+        print(f"Failed to load PornHub extension: {e}")
 
 bot.setup_hook = setup_hook
 
-bot.run(discord_token)
+if discord_token:
+    bot.run(discord_token)
+else:
+    print("ERROR: DISCORD_TOKEN environment variable not set!")
+
