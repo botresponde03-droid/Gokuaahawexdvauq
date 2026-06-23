@@ -3,7 +3,9 @@ import os
 import json
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix='.', description="Oh baby...")
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='.', description="Oh baby...", intents=intents)
 
 configFile = "config.json"
 if os.path.isfile("config.json"):
@@ -21,24 +23,27 @@ async def on_ready():
     print('------')
 
 @bot.command()
-async def stop():
+async def stop(ctx):
     print('------')
     print('Logging out')
-    await bot.logout()
+    await bot.close()
 
 @bot.command()
-async def play(word:str=None):
-    await bot.change_presence(game=discord.Game(name=word))
+async def play(ctx, word:str=None):
+    await bot.change_presence(activity=discord.Game(name=word))
 
 @bot.command()
-async def ping():
-    await bot.say("Pong!")
+async def ping(ctx):
+    await ctx.send("Pong!")
 
 @bot.event
 async def on_message(message):   
     await bot.process_commands(message)
 
 # Load cogs here
-bot.load_extension("PornHub")
+async def setup_hook():
+    await bot.load_extension("PornHub")
+
+bot.setup_hook = setup_hook
 
 bot.run(discord_token)
